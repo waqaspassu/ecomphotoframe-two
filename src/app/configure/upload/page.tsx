@@ -7,15 +7,14 @@ import { useDropzone } from "react-dropzone";
 
 const page = () => {
   const router = useRouter();
-  const { startUpload } = useUploadThing("imageUploader", {
+  const { startUpload, isUploading } = useUploadThing("imageUploader", {
     onClientUploadComplete: ([data]) => {
-      console.log({data})
       const configId = data.serverData.configId;
-      // router.push(`/configure/design?id = ${configId}`);
+      console.log({configId})
+      router.push(`/configure/design?id=${configId}`);
     },
   });
   const onDrop = useCallback((acceptedFiles: any) => {
-    console.log({ acceptedFiles });
     startUpload(acceptedFiles, { configId: undefined });
   }, []);
 
@@ -32,7 +31,7 @@ const page = () => {
       },
     });
   const isPending = false;
-  const isUploading = false;
+  // const isUploading = false;
 
   const files = acceptedFiles.map((file: any) => (
     <li key={file.path}>
@@ -44,21 +43,26 @@ const page = () => {
       <div
         className="relative w-full h-[30vh] bg-slate-100"
         {...getRootProps()}
+        aria-disabled={isUploading}
       >
         <input className="w-full h-full" {...getInputProps()} />
 
         {isDragActive ? (
           <h2>Drop here</h2>
         ) : isPending || isUploading ? (
-          <Loader2 />
+          <div className="absolute flex top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <h2 className="mr-2">Please wait we are redirecting you</h2>
+            <Loader2
+              className="text-primary animate-spin font-bold text-xl"
+              size={30}
+            />
+          </div>
         ) : (
-          <div>Please Upload your file here</div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            Please Upload your file here
+          </div>
         )}
       </div>
-      <aside>
-        <h4>Files</h4>
-        <ul>{files}</ul>
-      </aside>
     </div>
   );
 };
