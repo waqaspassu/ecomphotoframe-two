@@ -52,12 +52,12 @@ export const FRAMESIZES = [
 
 export const MATERIALS = [
   {
-    name: "Gold",
+    name: "gold",
     description: "Sexy Memories",
     price: 50,
   },
   {
-    name: "Dimond",
+    name: "diamond",
     description: "Cotting with dimond feels special",
     price: 90,
   },
@@ -65,12 +65,12 @@ export const MATERIALS = [
 
 export const FINISHES = [
   {
-    name: "Smooth Finish",
+    name: "smooth",
     description: "Smooth",
     price: 20,
   },
   {
-    name: "Textured",
+    name: "plaintextured",
     description: "Plain Textured",
     price: 30,
   },

@@ -13,10 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SizesCase {
+  small
+  medium
+  large
+}
+
+enum MaterialFrame {
+  gold
+  diamond
+}
+
+enum FinishesFrame {
+  smooth
+  plaintextured
+}
+
+enum ColorFrames {
+  red
+  blue
+  green
+}
+
 model Configuration {
   id              String  @id @default(cuid())
   width           Int
   height          Int
   croppedImageUrl String?
   imgUrl          String?
+
+  sizes     SizesCase?
+  materials MaterialFrame?
+  finishes  FinishesFrame?
+  color     ColorFrames?
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 import FrameContainer from "@/components/FrameContainer";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,24 +9,51 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "react-toastify";
+import { db } from "@/db";
 import { COLORSFRAME, FINISHES, FRAMESIZES, MATERIALS } from "@/lib/constant";
+import { useUploadThing } from "@/lib/uploadthings";
 import { cn } from "@/lib/utils";
 import { Configuration } from "@prisma/client";
 import { ArrowRight } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRef, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { ConfigurationTypeProps, saveConfig as _saveConfig } from "./action";
 
 const CustomizeCase = ({ configuration }: any) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const params = searchParams.get("id");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const caseRef = useRef<HTMLDivElement>(null);
+  const testRef = useRef<HTMLDivElement>(null);
   const [colorsFrame, setColorFrame] = useState<any>(COLORSFRAME);
   const [selectedFrame, setSelectedFrame] = useState(COLORSFRAME[0]);
 
   const [selectedSize, setSelectedSize] = useState(FRAMESIZES[0]);
   const [selectedFinish, setSelectedFinsih] = useState(FINISHES[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(MATERIALS[0]);
+  const [dimentions, setDimentions] = useState({
+    width: configuration.width / 4,
+    height: configuration.height / 4,
+  });
 
-  console.log({ colorsFrame });
+  const { mutate: saveConfig } = useMutation({
+    mutationFn: async (args: ConfigurationTypeProps) => {
+      Promise.all([_saveConfig(args), handleSave()]);
+    },
+    onSuccess: () => {
+      console.log("succeesss");
+      toast("successfully updated your configuration");
+      router.push(`/configure/summary?id?${configuration.id}`);
+    },
+    onError: () => {},
+  });
+
+  const { startUpload } = useUploadThing("imageUploader");
+
+  const [ordinate, setOrdinate] = useState({ x: 200, y: 400 });
 
   const handleChangeColorFrame = (frame: any) => {
     setSelectedFrame(frame);
@@ -44,11 +72,80 @@ const CustomizeCase = ({ configuration }: any) => {
 
   const totalPrice = selectedFinish.price + selectedMaterial.price;
 
+  const handleSave = async () => {
+    // const canvas =
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = dimentions.width;
+    canvas.height = dimentions.height;
+
+    // set background color
+    if (ctx) {
+      ctx.fillStyle = selectedFrame.color;
+      ctx.fillRect(0, 0, dimentions.width, dimentions.height);
+    }
+
+    const {
+      left: caseLeft,
+      top: caseTop,
+      width: caseWidth,
+      height: caseHeight,
+    } = caseRef.current!.getBoundingClientRect();
+
+    const { left: containerLeft, top: containerTop } =
+      containerRef.current!.getBoundingClientRect();
+
+    const offsetX = caseLeft - containerLeft;
+    const offsetY = caseTop - containerTop;
+
+    const actualX = ordinate.x - offsetX;
+    const actualY = ordinate.y - offsetY;
+
+    const img = new Image();
+    img.src = configuration.imgUrl;
+    img.crossOrigin = "anonymous";
+
+    img.onload = async () => {
+      const imageX = actualX;
+      const imageY = actualY;
+      const imageWidth = dimentions.width;
+      const imageHeight = dimentions.height;
+
+      ctx?.drawImage(img, imageX, imageY, imageWidth, imageHeight);
+      const dataUrl = canvas.toDataURL();
+      const base64Data = dataUrl.split(",")[1];
+      const mimeType = dataUrl.split(",")[0].split(";")[0].split(":")[1];
+      const blob = base64toblob(base64Data, mimeType);
+
+      const file = new File([blob], "filename.png", {
+        type: mimeType,
+      });
+
+      await startUpload([file], { configId: configuration.id });
+    };
+  };
+  function base64toblob(base64: string, mimeType: string) {
+    const byteString = atob(base64);
+    const byteNumber = new Array(byteString.length);
+    for (let i = 0; i <= byteString.length; i++) {
+      byteNumber[i] = byteString.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumber);
+
+    return new Blob([byteArray], { type: mimeType });
+  }
   return (
     <div className="flex p-10">
       <FrameContainer
         seletedColor={selectedFrame}
         configuration={configuration}
+        setDimentions={setDimentions}
+        setOrdinate={setOrdinate}
+        dimentions={dimentions}
+        ordinate={ordinate}
+        containerRef={containerRef}
+        caseRef={caseRef}
       />
       <div className="grow-[1] mt-10 pl-5">
         <h2 className="text-2xl font-bold">Customize your case</h2>
@@ -150,7 +247,17 @@ const CustomizeCase = ({ configuration }: any) => {
         </div>
         <div className="mt-5 flex w-1/2 justify-between items-center">
           <p>Total: {totalPrice}</p>
-          <Button>
+          <Button
+            onClick={() =>
+              saveConfig({
+                configId: configuration.id,
+                sizes: selectedSize.value,
+                materials: selectedMaterial.name,
+                finishes: selectedFinish.name,
+                color: selectedFrame.color,
+              })
+            }
+          >
             Continue <ArrowRight />
           </Button>
         </div>

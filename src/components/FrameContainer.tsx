@@ -7,18 +7,20 @@ import { Rnd } from "react-rnd";
 type FrameContainerProps = {
   seletedColor: any;
 };
-const FrameContainer = ({ seletedColor, configuration }: any) => {
+const FrameContainer = ({
+  seletedColor,
+  configuration,
+  setDimentions,
+  setOrdinate,
+  dimentions,
+  ordinate,
+  containerRef,
+  caseRef,
+}: any) => {
   console.log(configuration.imgUrl, "img url");
-  const [dimentions, setDimentions] = useState({
-    width: configuration.width / 4,
-    height: configuration.height / 4,
-  });
-
-  const [ordinate, setOrdinate] = useState({ x: 200, y: 400 });
-  const containerRef = useRef();
   return (
     <div
-      ref={containerRef.current}
+      ref={containerRef}
       className="mt-10 relative bg-green h-[60vh] border-4  border-zinc-400 grow-[2] border-dotted p-3"
     >
       <div
@@ -41,7 +43,7 @@ const FrameContainer = ({ seletedColor, configuration }: any) => {
           }}
           onResizeStop={(_, b, ref, ___, { x, y }) => {
             setDimentions({
-              width: parseInt(ref.style.width.slice(0, 2)),
+              width: parseInt(ref.style.width.slice(0, -2)),
               height: parseInt(ref.style.height.slice(0, -2)),
             });
 
@@ -51,7 +53,12 @@ const FrameContainer = ({ seletedColor, configuration }: any) => {
             });
           }}
         >
-          <Image alt="frame image" src={configuration.imgUrl} fill />
+          <Image
+            ref={caseRef}
+            alt="frame image"
+            src={configuration.imgUrl}
+            fill
+          />
         </Rnd>
       </div>
     </div>

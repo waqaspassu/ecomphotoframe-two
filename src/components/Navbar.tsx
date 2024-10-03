@@ -2,8 +2,11 @@ import React from "react";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { buttonVariants } from "./ui/button";
 import Link from "next/link";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-const Navbar = () => {
+const Navbar = async () => {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   return (
     <div className="sticky">
       <MaxWidthWrapper>

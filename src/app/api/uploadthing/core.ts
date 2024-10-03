@@ -7,18 +7,19 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB" } })
-    .input(z.object({ configId: z.string().optional() }))
+    .input(
+      z.object({
+        configId: z.string().optional(),
+      })
+    )
     .middleware(async ({ input }) => {
       return {
         configId: input.configId,
       };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log(file);
       const res = await fetch(file.url);
       const buffer = await res.arrayBuffer();
-      console.log({ res });
-      console.log({ buffer });
       const imgMetadata = await sharp(buffer).metadata();
 
       if (!metadata.configId) {
@@ -32,6 +33,22 @@ export const ourFileRouter = {
 
         return {
           configId: confiurationId.id,
+          croppedImageUrl: confiurationId.croppedImageUrl,
+        };
+      }
+
+      if (metadata.configId) {
+        const updatedConfigurationId = await db.configuration.update({
+          where: {
+            id: metadata.configId,
+          },
+          data: {
+            croppedImageUrl: file.url,
+          },
+        });
+
+        return {
+          configId: updatedConfigurationId.id,
         };
       }
 
