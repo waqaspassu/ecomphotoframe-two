@@ -35,6 +35,56 @@ enum ColorFrames {
   green
 }
 
+enum OrderStatus {
+  awaiting
+  rejected
+  fullfilled
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  configurationId String
+  configuraiton   Configuration @relation(fields: [configurationId], references: [id])
+  User            User?         @relation(fields: [userId], references: [id])
+  userId          String?
+  amount          Float
+  isPaid          Boolean       @default(false)
+  status          OrderStatus   @default(awaiting)
+
+  shippingAddress   ShippingAddress? @relation(fields: [shippingAddressId], references: [id])
+  shippingAddressId String?
+
+  bilingAddress    BillingAddress? @relation(fields: [billingAddressId], references: [id])
+  billingAddressId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model ShippingAddress {
+  id          String  @id @default(cuid())
+  name        String
+  street      String
+  city        String
+  postalCode  String
+  country     String
+  state       String?
+  phoneNumber String?
+  order       Order[]
+}
+
+model BillingAddress {
+  id           String  @id @default(cuid())
+  name         String
+  street       String
+  city         String
+  postalCode   String
+  courtry      String
+  state        String?
+  phoneNumeber String?
+  Order        Order[]
+}
+
 model Configuration {
   id              String  @id @default(cuid())
   width           Int
@@ -46,4 +96,13 @@ model Configuration {
   materials MaterialFrame?
   finishes  FinishesFrame?
   color     ColorFrames?
+  Order     Order[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String
+  Order     Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

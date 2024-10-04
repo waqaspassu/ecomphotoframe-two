@@ -69,9 +69,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section>
-          <Footer />
-        </section>
+        
       </MaxWidthWrapper>
     </div>
   );

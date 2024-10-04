@@ -1,13 +1,36 @@
-import { useQuery } from "@tanstack/react-query";
-import React from "react";
+"use client";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
 import { ConfigurationTypeProps } from "../design/action";
 import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FINISHES, MATERIALS } from "@/lib/constant";
+
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { formatPrice } from "@/lib/utils";
+import LoginModal from "@/components/Login";
+import { checkoutSession } from "./action";
+import { useRouter } from "next/navigation";
 
 const Summary = ({ configuration }: { configuration: any }) => {
+  const router = useRouter();
+  const [isOpenLoginModal, setIsOpenLoginModal] = useState<boolean>(false);
+  const { user } = useKindeBrowserClient();
+
+  const { mutate: checkoutSessionMutation } = useMutation({
+    mutationKey: ["checkout-mutation"],
+    mutationFn: checkoutSession,
+    onSuccess: ({ url }) => {
+      if (url) {
+        console.log("success", url);
+        router.push(url);
+      } else {
+        throw new Error("Sorry we dont get url");
+      }
+    },
+  });
+
   const finishes =
     FINISHES.find((finish) => finish.name === configuration.finishes)?.price ??
     0;
@@ -16,8 +39,18 @@ const Summary = ({ configuration }: { configuration: any }) => {
     MATERIALS.find((material) => material.name === configuration.materials)
       ?.price ?? 0;
 
+  const handleSave = () => {
+    if (!user) {
+      setIsOpenLoginModal(true);
+      localStorage.setItem("configurationId", configuration.id);
+    } else {
+      checkoutSessionMutation({ configId: configuration.id });
+    }
+  };
+
   return (
     <div className="flex mt-10 gap-5">
+      <LoginModal isOpen={isOpenLoginModal} />
       <div>
         <Image
           src={configuration.croppedImageUrl}
@@ -70,7 +103,7 @@ const Summary = ({ configuration }: { configuration: any }) => {
           <p>{formatPrice(material + finishes)}</p>
         </div>
         <div className="mt-14 flex justify-end">
-          <Button className="">
+          <Button onClick={() => handleSave()} className="">
             Checkout <ArrowRight className="w-4 h-4 mr-2" />
           </Button>
         </div>

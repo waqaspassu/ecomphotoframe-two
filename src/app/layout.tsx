@@ -10,6 +10,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import Provider from "@/components/Provider";
+import Footer from "@/components/Footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,7 +41,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
-        <Provider>{children}</Provider>
+        <div className="flex flex-1  mx-auto mt-[68px]">
+          <Provider>{children}</Provider>
+        </div>
+        <section className="bottom-0">
+          <Footer />
+        </section>
       </body>
     </html>
   );
