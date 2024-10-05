@@ -96,6 +96,7 @@ export const checkoutSession = async ({ configId }: { configId: string }) => {
     shipping_address_collection: {
       allowed_countries: ["AC", "AF", "PK"],
     },
+    billing_address_collection: "required",
     metadata: {
       userId: user.id,
       orderId: order.id,

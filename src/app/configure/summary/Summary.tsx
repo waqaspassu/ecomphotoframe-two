@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/utils";
 import LoginModal from "@/components/Login";
 import { checkoutSession } from "./action";
 import { useRouter } from "next/navigation";
+import { object } from "zod";
 
 const Summary = ({ configuration }: { configuration: any }) => {
   const router = useRouter();
@@ -40,6 +41,7 @@ const Summary = ({ configuration }: { configuration: any }) => {
       ?.price ?? 0;
 
   const handleSave = () => {
+    console.log({ user }, "user");
     if (!user) {
       setIsOpenLoginModal(true);
       localStorage.setItem("configurationId", configuration.id);
@@ -47,20 +49,27 @@ const Summary = ({ configuration }: { configuration: any }) => {
       checkoutSessionMutation({ configId: configuration.id });
     }
   };
-
+console.log("cr", configuration)
   return (
     <div className="flex mt-10 gap-5">
       <LoginModal isOpen={isOpenLoginModal} />
       <div>
-        <Image
-          src={configuration.croppedImageUrl}
-          width={configuration.width / 4}
-          height={configuration.height / 4}
-          alt="your frame image"
-        />
+        {
+          
+        }
+        {configuration.croppedImageUrl && (
+          <Image
+            src={configuration?.croppedImageUrl}
+            width={configuration.width / 4}
+            height={configuration.height / 4}
+            alt="your frame image"
+          />
+        )}
       </div>
       <div className="pl-5">
-        <h2 className="text-3xl font-bold">Your {configuration.sizes} frame</h2>
+        <h2 className="text-3xl font-bold">
+          Your {configuration?.sizes} frame
+        </h2>
         <div className="flex  items-center mt-2">
           <Check className="text-green-700 w-5 h-5 " />
           <p className="text-muted-foreground">In stock are ready to ship</p>

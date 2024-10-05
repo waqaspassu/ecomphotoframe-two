@@ -46,7 +46,7 @@ const CustomizeCase = ({ configuration }: any) => {
     onSuccess: () => {
       console.log("succeesss");
       toast("successfully updated your configuration");
-      router.push(`/configure/summary?id?${configuration.id}`);
+      router.push(`/configure/summary?id=${configuration.id}`);
     },
     onError: () => {},
   });

@@ -41,10 +41,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
-        <div className="flex flex-1  mx-auto mt-[68px]">
+        <div className="relative flex flex-1  mx-auto mt-[68px]">
           <Provider>{children}</Provider>
         </div>
-        <section className="bottom-0">
+        <section className="relative">
           <Footer />
         </section>
       </body>

@@ -9,6 +9,8 @@ const page = async ({ searchParams }: any) => {
     },
   });
 
+  console.log({ configuration });
+
   return (
     <div className="p-10">
       <Summary configuration={configuration} />
