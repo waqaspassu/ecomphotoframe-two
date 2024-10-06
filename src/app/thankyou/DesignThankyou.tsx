@@ -1,10 +1,9 @@
 "use client";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
-import React from "react";
-import { getPaymentStatus } from "./action";
-import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { getPaymentStatus } from "./action";
 
 const DesignThankyou = () => {
   const searchParams = useSearchParams();
@@ -21,6 +20,7 @@ const DesignThankyou = () => {
   });
 
   return (
+
     <div className="grid grid-cols-3 gap-6 my-10">
       <div className="relative col-span-1 pl-8">
         {orders &&

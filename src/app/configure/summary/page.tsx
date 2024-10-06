@@ -1,19 +1,16 @@
-import React from "react";
-import Summary from "./Summary";
 import { db } from "@/db";
+import Summary from "./Summary";
 
-const page = async ({ searchParams }: any) => {
+const page = async ({ searchParams }: { searchParams: { id: string } }) => {
   const configuration = await db.configuration.findFirst({
     where: {
       id: searchParams.id,
     },
   });
 
-  console.log({ configuration });
-
   return (
     <div className="p-10">
-      <Summary configuration={configuration} />
+      {configuration && <Summary configuration={configuration} />}
     </div>
   );
 };

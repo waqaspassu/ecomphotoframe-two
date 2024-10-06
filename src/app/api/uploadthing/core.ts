@@ -1,8 +1,7 @@
+import { db } from "@/db";
+import sharp from "sharp";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { z } from "zod";
-import sharp from "sharp";
-import { db } from "@/db";
-import { revalidatePath } from "next/cache";
 
 const f = createUploadthing();
 
@@ -22,7 +21,6 @@ export const ourFileRouter = {
       const res = await fetch(file.url);
       const buffer = await res.arrayBuffer();
       const imgMetadata = await sharp(buffer).metadata();
-      console.log({ metadata });
       if (!metadata.configId) {
         const confiurationId = await db.configuration.create({
           data: {
@@ -39,8 +37,6 @@ export const ourFileRouter = {
       }
 
       if (metadata.configId) {
-        console.log({ file });
-        console.log(file.url, "file url");
 
         const updatedConfigurationId = await db.configuration.update({
           where: {

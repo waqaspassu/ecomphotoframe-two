@@ -1,8 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-
-declare global {
-  var cachedPrisma: PrismaClient;
-}
+import { PrismaClient } from "@prisma/client";
 
 let prisma: PrismaClient;
 

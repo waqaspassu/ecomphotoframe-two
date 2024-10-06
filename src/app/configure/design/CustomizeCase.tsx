@@ -1,6 +1,5 @@
 "use client";
 
-import { ourFileRouter } from "@/app/api/uploadthing/core";
 import FrameContainer from "@/components/FrameContainer";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,28 +8,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "react-toastify";
-import { db } from "@/db";
 import { COLORSFRAME, FINISHES, FRAMESIZES, MATERIALS } from "@/lib/constant";
 import { useUploadThing } from "@/lib/uploadthings";
 import { cn } from "@/lib/utils";
 import { Configuration } from "@prisma/client";
-import { ArrowRight } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 import { ConfigurationTypeProps, saveConfig as _saveConfig } from "./action";
 
-const CustomizeCase = ({ configuration }: any) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const params = searchParams.get("id");
-  const containerRef = useRef<HTMLDivElement>(null);
-  const caseRef = useRef<HTMLDivElement>(null);
-  const testRef = useRef<HTMLDivElement>(null);
-  const [colorsFrame, setColorFrame] = useState<any>(COLORSFRAME);
-  const [selectedFrame, setSelectedFrame] = useState(COLORSFRAME[0]);
 
+type ColorFrameType = {
+  readonly title: "Red" | "Blue" | "Black"; // Using string literal types for title
+  readonly color: "red" | "blue" | "green"; // Using string literal types for color
+};
+
+const CustomizeCase = ({ configuration }: { configuration: Configuration }) => {
+  const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const caseRef = useRef<HTMLImageElement | null>(null);
+  const [colorsFrame, setColorFrame] = useState(COLORSFRAME);
+  const [selectedFrame, setSelectedFrame] = useState(COLORSFRAME[0]);
   const [selectedSize, setSelectedSize] = useState(FRAMESIZES[0]);
   const [selectedFinish, setSelectedFinsih] = useState(FINISHES[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(MATERIALS[0]);
@@ -44,29 +44,30 @@ const CustomizeCase = ({ configuration }: any) => {
       Promise.all([_saveConfig(args), handleSave()]);
     },
     onSuccess: () => {
-      console.log("succeesss");
       toast("successfully updated your configuration");
       router.push(`/configure/summary?id=${configuration.id}`);
     },
-    onError: () => {},
+    onError: () => {
+      console.log(setColorFrame);
+    },
   });
 
   const { startUpload } = useUploadThing("imageUploader");
 
   const [ordinate, setOrdinate] = useState({ x: 200, y: 400 });
 
-  const handleChangeColorFrame = (frame: any) => {
-    setSelectedFrame(frame);
+  const handleChangeColorFrame = (frame: ColorFrameType) => {
+    setSelectedFrame(frame as typeof selectedFrame);
   };
 
-  const handleChangeSize = (size: any) => {
+  const handleChangeSize = (size: typeof selectedSize) => {
     setSelectedSize(size);
   };
 
-  const handleClickMaterial = (material: any) => {
+  const handleClickMaterial = (material: typeof selectedMaterial) => {
     setSelectedMaterial(material);
   };
-  const handleFinishClick = (finish: any) => {
+  const handleFinishClick = (finish: typeof selectedFinish) => {
     setSelectedFinsih(finish);
   };
 
@@ -85,12 +86,8 @@ const CustomizeCase = ({ configuration }: any) => {
       ctx.fillRect(0, 0, dimentions.width, dimentions.height);
     }
 
-    const {
-      left: caseLeft,
-      top: caseTop,
-      width: caseWidth,
-      height: caseHeight,
-    } = caseRef.current!.getBoundingClientRect();
+    const { left: caseLeft, top: caseTop } =
+      caseRef.current!.getBoundingClientRect();
 
     const { left: containerLeft, top: containerTop } =
       containerRef.current!.getBoundingClientRect();
@@ -102,7 +99,7 @@ const CustomizeCase = ({ configuration }: any) => {
     const actualY = ordinate.y - offsetY;
 
     const img = new Image();
-    img.src = configuration.imgUrl;
+    img.src = configuration.imgUrl as string;
     img.crossOrigin = "anonymous";
 
     img.onload = async () => {
@@ -143,7 +140,6 @@ const CustomizeCase = ({ configuration }: any) => {
         setDimentions={setDimentions}
         setOrdinate={setOrdinate}
         dimentions={dimentions}
-        ordinate={ordinate}
         containerRef={containerRef}
         caseRef={caseRef}
       />
@@ -153,7 +149,7 @@ const CustomizeCase = ({ configuration }: any) => {
         <div className="mt-5">
           <h3>Color : {selectedFrame.title}</h3>
           <div className="flex">
-            {colorsFrame.map((frame: typeof selectedFrame, index: number) => {
+            {colorsFrame.map((frame, index) => {
               return (
                 <div
                   className={cn(
@@ -161,8 +157,8 @@ const CustomizeCase = ({ configuration }: any) => {
                     `border-${frame.color}`
                   )}
                   style={{ borderColor: frame.color }}
-                  onClick={() => handleChangeColorFrame(frame)}
-                  key={frame.color}
+                  onClick={() => handleChangeColorFrame(frame as typeof selectedFrame)}
+                  key={index}
                 >
                   <div
                     className={cn(
@@ -191,7 +187,9 @@ const CustomizeCase = ({ configuration }: any) => {
                   return (
                     <DropdownMenuItem
                       className="w-1/2"
-                      onClick={() => handleChangeSize(frame)}
+                      onClick={() =>
+                        handleChangeSize(frame as typeof selectedSize)
+                      }
                       key={frame.value}
                     >
                       {frame.title}
@@ -209,7 +207,9 @@ const CustomizeCase = ({ configuration }: any) => {
           {MATERIALS.map((material) => {
             return (
               <div
-                onClick={() => handleClickMaterial(material)}
+                onClick={() =>
+                  handleClickMaterial(material as typeof selectedMaterial)
+                }
                 key={material.name}
                 className={cn(
                   "cursor-pointer flex p-4 border border-zinc-200 my-2 w-1/2 justify-between",
@@ -232,7 +232,9 @@ const CustomizeCase = ({ configuration }: any) => {
             return (
               <div
                 key={finish.name}
-                onClick={() => handleFinishClick(finish)}
+                onClick={() =>
+                  handleFinishClick(finish as typeof selectedFinish)
+                }
                 className={cn(
                   "flex p-5 border border-zinc-200 w-1/2 my-2 justify-between cursor-pointer",
                   finish.name === selectedFinish.name ? "border-primary" : ""
@@ -266,4 +268,6 @@ const CustomizeCase = ({ configuration }: any) => {
   );
 };
 
+
 export default CustomizeCase;
+

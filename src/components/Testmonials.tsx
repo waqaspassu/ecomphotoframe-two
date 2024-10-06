@@ -1,6 +1,5 @@
 import { Check, Star } from "lucide-react";
 import Image from "next/image";
-import React from "react";
 
 const Testmonials = () => {
   return (

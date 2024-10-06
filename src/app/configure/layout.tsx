@@ -1,7 +1,7 @@
-import React from 'react'
+import { ReactElement } from 'react'
 import Stepper from './upload/Stepper'
 
-const layout = ({children}:any) => {
+const layout = ({children}:{children:ReactElement}) => {
   return (
     <div>
         <Stepper />

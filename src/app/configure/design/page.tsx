@@ -1,24 +1,13 @@
-import FrameContainer from "@/components/FrameContainer";
-import {
-  notFound,
-  useParams,
-  usePathname,
-  useSearchParams,
-} from "next/navigation";
-import React, { useState } from "react";
-import CustomizeCase from "./CustomizeCase";
-import { COLORSFRAME } from "@/lib/constant";
 import { db } from "@/db";
-import { getConfiguration } from "./action";
+import { notFound } from "next/navigation";
+import CustomizeCase from "./CustomizeCase";
 
-const page = async ({searchParams}:any) => {
+const Page = async ({ searchParams }: { searchParams: { id: string } }) => {
   const configuration = await db.configuration.findFirst({
     where: {
       id: searchParams.id,
     },
   });
-
-  console.log({ searchParams });
 
   if (!configuration) {
     return notFound();
@@ -27,4 +16,4 @@ const page = async ({searchParams}:any) => {
   return <CustomizeCase configuration={configuration} />;
 };
 
-export default page;
+export default Page;

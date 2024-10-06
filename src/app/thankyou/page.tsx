@@ -1,11 +1,12 @@
-import { db } from "@/db";
-import React from "react";
+import { Suspense } from "react";
 import DesignThankyou from "./DesignThankyou";
 
-const page = async ({ searchParams }: { searchParams: string }) => {
+const page = async () => {
   return (
     <div className="w-full">
+      <Suspense fallback={<div>Loading...</div>}>
       <DesignThankyou />
+      </Suspense>
     </div>
   );
 };

@@ -4,8 +4,8 @@ import { db } from "@/db";
 
 import {
   ColorFrames,
-  MaterialFrame,
   FinishesFrame,
+  MaterialFrame,
   SizesCase,
 } from "@prisma/client";
 
@@ -36,7 +36,7 @@ export const saveConfig = async ({
   materials,
   finishes,
 }: ConfigurationTypeProps) => {
-  const res = await db.configuration.update({
+   await db.configuration.update({
     where: {
       id: configId,
     },

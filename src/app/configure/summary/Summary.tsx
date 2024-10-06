@@ -1,20 +1,19 @@
 "use client";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
-import { ConfigurationTypeProps } from "../design/action";
-import Image from "next/image";
-import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FINISHES, MATERIALS } from "@/lib/constant";
+import { useMutation } from "@tanstack/react-query";
+import { ArrowRight, Check } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-import { formatPrice } from "@/lib/utils";
 import LoginModal from "@/components/Login";
-import { checkoutSession } from "./action";
+import { formatPrice } from "@/lib/utils";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { useRouter } from "next/navigation";
-import { object } from "zod";
+import { checkoutSession } from "./action";
+import { Configuration } from "@prisma/client";
 
-const Summary = ({ configuration }: { configuration: any }) => {
+const Summary = ({ configuration }: { configuration: Configuration }) => {
   const router = useRouter();
   const [isOpenLoginModal, setIsOpenLoginModal] = useState<boolean>(false);
   const { user } = useKindeBrowserClient();
@@ -24,7 +23,6 @@ const Summary = ({ configuration }: { configuration: any }) => {
     mutationFn: checkoutSession,
     onSuccess: ({ url }) => {
       if (url) {
-        console.log("success", url);
         router.push(url);
       } else {
         throw new Error("Sorry we dont get url");
@@ -41,7 +39,6 @@ const Summary = ({ configuration }: { configuration: any }) => {
       ?.price ?? 0;
 
   const handleSave = () => {
-    console.log({ user }, "user");
     if (!user) {
       setIsOpenLoginModal(true);
       localStorage.setItem("configurationId", configuration.id);
@@ -49,7 +46,6 @@ const Summary = ({ configuration }: { configuration: any }) => {
       checkoutSessionMutation({ configId: configuration.id });
     }
   };
-console.log("cr", configuration)
   return (
     <div className="flex mt-10 gap-5">
       <LoginModal isOpen={isOpenLoginModal} />

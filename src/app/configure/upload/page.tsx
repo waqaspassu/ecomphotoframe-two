@@ -2,23 +2,23 @@
 import { useUploadThing } from "@/lib/uploadthings";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
     onClientUploadComplete: ([data]) => {
       const configId = data.serverData.configId;
-      console.log({ configId });
       router.push(`/configure/design?id=${configId}`);
     },
   });
-  const onDrop = useCallback((acceptedFiles: any) => {
-    startUpload(acceptedFiles, { configId: undefined });
-  }, []);
 
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    startUpload(acceptedFiles, { configId: undefined });
+  }, [startUpload]);
+
+  const { getRootProps, getInputProps, isDragActive } =
     useDropzone({
       onDrop,
       accept: {
@@ -26,18 +26,12 @@ const page = () => {
         "image/jpeg": [".jpeg"],
         "image/jpg": [".jpg"],
       },
-      onDropRejected(fileRejections, event) {
+      onDropRejected() {
         console.log("reject");
       },
     });
   const isPending = false;
-  // const isUploading = false;
-
-  const files = acceptedFiles.map((file: any) => (
-    <li key={file.path}>
-      {file.path} - {file.size} bytes
-    </li>
-  ));
+  
   return (
     <div>
       <div
@@ -67,4 +61,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

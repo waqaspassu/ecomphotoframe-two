@@ -4,7 +4,12 @@ import { db } from "@/db";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import Stripe from "stripe";
+
+import EmailTemplate from "@/components/EmailTemplate";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +33,6 @@ export async function POST(req: Request) {
       }
 
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log(session.customer_details?.address);
       const { userId, orderId } = event.data.object.metadata || {
         userId: null,
         orderId: null,
@@ -40,8 +44,7 @@ export async function POST(req: Request) {
 
       const shippingAddress = session.shipping_details?.address;
       const billingAddress = session.customer_details?.address;
-
-      const updateOrder = await db.order.update({
+      await db.order.update({
         where: {
           id: orderId,
         },
@@ -68,12 +71,20 @@ export async function POST(req: Request) {
           },
         },
       });
+      if (session.customer_details?.email)
+        await resend.emails.send({
+          from: "Acme <onboarding@resend.dev>",
+          to: [session.customer_details?.email]!,
+          subject: "Quba Frame",
+          react: EmailTemplate(),
+        });
     }
     return NextResponse.json({
       result: event,
       ok: true,
     });
   } catch (err) {
+    console.error(err);
     return NextResponse.json(
       {
         message: "Something went wrong",

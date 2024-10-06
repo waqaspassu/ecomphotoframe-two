@@ -1,6 +1,5 @@
 "use client";
 
-import Footer from "@/components/Footer";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Slider from "@/components/Slider";
 import Testmonials from "@/components/Testmonials";

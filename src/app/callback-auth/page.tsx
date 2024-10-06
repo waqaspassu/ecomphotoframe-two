@@ -1,22 +1,25 @@
 "use client";
-import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { withAuth } from "@kinde-oss/kinde-auth-nextjs/middleware";
-import LoginModal from "@/components/Login";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
 
-  const [configId, setConfigId] = useState(
-    localStorage.getItem("configurationId")
-  );
+  const [configId, setConfigId] = useState<string | null>(null);
 
   if (configId) {
     router.push(`/configure/summary?id=${configId}`);
   } else {
     router.push("/");
   }
+
+  useEffect(() => {
+    const configurationId = localStorage.getItem("configurationId");
+    setConfigId(configurationId);
+  }, []);
+
+  console.log(setConfigId);
 
   return (
     <div className="h-[35rem]">
@@ -30,4 +33,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

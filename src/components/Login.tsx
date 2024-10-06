@@ -1,11 +1,8 @@
-import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";

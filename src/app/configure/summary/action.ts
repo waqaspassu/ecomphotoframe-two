@@ -1,9 +1,8 @@
 "use server";
 import { db } from "@/db";
-import { FINISHES } from "@/lib/constant";
 import { PRODUCT_PRICES } from "@/lib/prices";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { Order, OrderStatus } from "@prisma/client";
+import { Order } from "@prisma/client";
 
 import { stripe } from "@/lib/stripe";
 
@@ -67,7 +66,6 @@ export const checkoutSession = async ({ configId }: { configId: string }) => {
   if (existingOrder) {
     order = existingOrder;
   } else {
-    console.log(user.id, "user id");
 
     order = await db.order.create({
       data: {

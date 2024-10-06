@@ -1,17 +1,13 @@
-import React from "react";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { buttonVariants } from "./ui/button";
-import Link from "next/link";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
-import { ArrowRight } from "lucide-react";
 
 const Navbar = async () => {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
   const ADMIN_EMAIL = "waqasquba@gmail.com";
-
-
 
   return (
     <div className="relative">
@@ -26,7 +22,7 @@ const Navbar = async () => {
             </div>
             {user && user.email === ADMIN_EMAIL && (
               <div className="pr-4">
-                <Link className="hover:text-primary" href="/">
+                <Link className="hover:text-primary" href="/dashboard">
                   Dashboard
                 </Link>
               </div>

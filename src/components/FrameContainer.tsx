@@ -1,11 +1,23 @@
 import { cn } from "@/lib/utils";
+import { Configuration } from "@prisma/client";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
 
 import { Rnd } from "react-rnd";
 
 type FrameContainerProps = {
-  seletedColor: any;
+  seletedColor: {
+    readonly title: "Red" | "Green" | "Blue";
+    readonly color: "red" | "green" | "blue";
+  };
+  configuration: Configuration;
+  setDimentions: (dimensions: { width: number; height: number }) => void;
+  setOrdinate: (ordinate: { x: number; y: number }) => void;
+  dimentions: {
+    width: number;
+    height: number;
+  };
+  containerRef: React.RefObject<HTMLDivElement>;
+  caseRef: React.MutableRefObject<HTMLImageElement | null>;
 };
 const FrameContainer = ({
   seletedColor,
@@ -13,11 +25,9 @@ const FrameContainer = ({
   setDimentions,
   setOrdinate,
   dimentions,
-  ordinate,
   containerRef,
   caseRef,
-}: any) => {
-  console.log(configuration.imgUrl, "img url");
+}: FrameContainerProps) => {
   return (
     <div
       ref={containerRef}
@@ -25,20 +35,20 @@ const FrameContainer = ({
     >
       <div
         className={cn(
-          "relative  w-full h-full border-2 border-zinc-300 border-dotted"
+          "relative  w-full h-full border-2 border-zinc-300 border-dotted "
         )}
         style={{ backgroundColor: seletedColor.color }}
       >
         <Rnd
+          className="absolute z-20 border-[3px] border-primary"
           lockAspectRatio
           default={{
             width: dimentions.width,
             height: dimentions.height,
-            x: 120,
+            x: 150,
             y: 100,
           }}
-          onDragStop={(e: any, d: any) => {
-            console.log("d", d);
+          onDragStop={(_, d) => {
             setOrdinate({ x: d.x, y: d.y });
           }}
           onResizeStop={(_, b, ref, ___, { x, y }) => {
@@ -56,7 +66,7 @@ const FrameContainer = ({
           <Image
             ref={caseRef}
             alt="frame image"
-            src={configuration.imgUrl}
+            src={configuration.imgUrl ?? ""}
             fill
           />
         </Rnd>
